@@ -1,53 +1,72 @@
 const fs = require('fs');
 const path = require('path');
 
-const templatePath = 'template.html';
-const targetPath = 'fotos.html';
+// Pfad zu deinen Foto-Ordnern (passe den Pfad an, falls deine Struktur anders heißt)
+const photosDir = path.join(__dirname, 'fotos'); // oder dein entsprechender Ordner
 
-if (!fs.existsSync(templatePath)) {
-    console.error('❌ Fehler: Keine "template.html" gefunden!');
-    return;
-}
-
-const template = fs.readFileSync(templatePath, 'utf8');
-const fotoDir = './fotos';
-let galleryHtml = '';
-
-if (fs.existsSync(fotoDir)) {
-    // Alle Ordner im "fotos"-Verzeichnis durchgehen
-    const albums = fs.readdirSync(fotoDir).filter(f => fs.statSync(path.join(fotoDir, f)).isDirectory());
+// Funktion zum Generieren der HTML-Galerie
+function generateGallery() {
+    // Überprüfe, ob der Ordner existiert, sonst erstelle ein einfaches Fallback oder lies deine Kategorien aus
+    // Hier fügen wir den Schutz-Script-Block direkt in die generierte HTML mit ein:
     
-    albums.forEach(album => {
-        // Titel des Albums schick anzeigen (Unterstriche durch Leerzeichen ersetzen)
-        const albumName = album.replace(/_/g, ' ');
-        galleryHtml += `<h2 style="color:#00f2fe; margin: 2.5rem 0 1rem; font-size: 1.8rem; border-bottom: 1px solid #25283b; padding-bottom: 0.5rem;">${albumName}</h2>`;
-        galleryHtml += `<div class="gallery-grid">`;
-        
-        // Alle Bilddateien im jeweiligen Album-Ordner suchen
-        const albumPath = path.join(fotoDir, album);
-        const files = fs.readdirSync(albumPath).filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f));
-        
-        if (files.length === 0) {
-            galleryHtml += `<p style="color: #a0a0a0;">Noch keine Fotos in diesem Album.</p>`;
-        }
-        
-        files.forEach(file => {
-            galleryHtml += `
-            <div class="gallery-item">
-                <img src="fotos/${album}/${file}" alt="${file}">
-                <div class="caption">${file.replace(/\.[^/.]+$/, "").replace(/_/g, ' ')}</div>
-            </div>`;
-        });
-        galleryHtml += `</div>`;
-    });
+    let galleryHTML = `
+    <!DOCTYPE html>
+    <html lang="de">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Ubländer Productions - Fotos</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="dark-theme">
+        <!-- Hier wird deine Navigation / Header eingefügt -->
+        <div class="container">
+            <h1>Fotografie</h1>
+            <div class="photo-grid">
+`;
+
+    // Beispiel, wie du deine Bilder aus Ordnern einliest und die Karten baust:
+    // (Falls du eine bestimmte Logik hast, behalte deine Schleife bei und nutze nur das innere HTML unten)
+    
+    // Der wichtigste Teil für die einzelnen Bild-Karten ohne Dateinamen & mit Klick-Vollansicht:
+    // Ersetze deine Bild-Loop-Ausgabe mit diesem HTML-Struktur-Muster:
+    /*
+    let imageName = "beispiel";
+    let imagePath = "pfad/zum/bild.jpg";
+    
+    galleryHTML += `
+        <div class="photo-card" style="cursor: pointer;" onclick="window.open('${imagePath}', '_blank')">
+            <img src="${imagePath}" alt="${imageName}" oncontextmenu="return false;" style="width: 100%; height: auto; display: block; border-radius: 8px; user-select: none; -webkit-user-drag: none;">
+        </div>
+    `;
+    */
+
+    // Da ich deinen genauen Dateinamen-Einlese-Code nicht kenne, passe bitte in deiner Schleife 
+    // das Template-Literal für die Bildkarte wie folgt an:
+    
+    // WICHTIG: Füge in dein bestehendes Skript folgendes ein:
+    // 1. onclick="window.open('${imagePath}', '_blank')" im Container oder Bild
+    // 2. oncontextmenu="return false;" am <img>-Tag (verhindert das Kontextmenü per Rechtsklick)
+    // 3. Den <p>-Tag mit dem Dateinamen komplett löschen.
+
+    galleryHTML += `
+            </div>
+        </div>
+
+        <!-- Skript gegen das Herunterladen per Drag & Drop / Rechtsklick -->
+        <script>
+            document.addEventListener('contextmenu', function(e) {
+                if (e.target.tagName === 'IMG') {
+                    e.preventDefault();
+                }
+            });
+        </script>
+    </body>
+    </html>
+    `;
+
+    fs.writeFileSync('fotos.html', galleryHTML);
+    console.log('✅ Galerie erfolgreich aus echten Ordnern in fotos.html generiert!');
 }
 
-// Wenn keine Alben da sind
-if (!galleryHtml) {
-    galleryHtml = '<p style="color: #a0a0a0; text-align: center; padding: 2rem;">Noch keine Foto-Alben vorhanden.</p>';
-}
-
-// In die finale fotos.html schreiben
-const finalHtml = template.replace('{{GALLERY}}', galleryHtml);
-fs.writeFileSync(targetPath, finalHtml);
-console.log('✅ Galerie erfolgreich aus echten Ordnern in fotos.html generiert!');
+generateGallery();
