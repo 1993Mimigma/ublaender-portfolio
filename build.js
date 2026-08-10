@@ -17,16 +17,17 @@ function generateGallery() {
                 .filter(file => /\.(jpg|jpeg|png|webp|avif)$/i.test(file));
 
             categoriesHTML += `
-                <div class="category-section" style="margin-bottom: 40px;">
-                    <h2 style="color: #00f0ff; margin-bottom: 20px;">${categoryName}</h2>
-                    <div class="photo-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+                <div class="category-section" style="margin-bottom: 50px;">
+                    <h2 style="color: #00f0ff; margin-bottom: 20px; border-bottom: 2px solid #00f0ff; padding-bottom: 5px; display: inline-block;">${categoryName}</h2>
+                    <div class="photo-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
             `;
 
             images.forEach(image => {
                 const imagePath = `fotos/${categoryName}/${image}`;
                 categoriesHTML += `
-                    <div class="photo-card" style="cursor: pointer;" onclick="window.open('${imagePath}', '_blank')">
-                        <img src="${imagePath}" alt="${image}" oncontextmenu="return false;" style="width: 100%; height: auto; display: block; border-radius: 8px; user-select: none; -webkit-user-drag: none;">
+                    <div class="photo-card" style="position: relative; border-radius: 8px; overflow: hidden; background: #111; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+                        <img src="${imagePath}" alt="${image}" style="width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none; pointer-events: none;">
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;" onclick="openLightbox('${imagePath}')" title="In Großansicht öffnen"></div>
                     </div>
                 `;
             });
@@ -47,17 +48,35 @@ function generateGallery() {
         <title>Ubländer Productions - Fotos</title>
         <link rel="stylesheet" href="style.css">
     </head>
-    <body class="dark-theme" style="background-color: #0b0f19; color: #fff; font-family: sans-serif; padding: 20px;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto;">
+    <body class="dark-theme" style="background-color: #0b0f19; color: #fff; font-family: sans-serif; padding: 20px; margin: 0;">
+        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
             <h1 style="text-align: center; margin-bottom: 10px;">Fotografie</h1>
             <p style="text-align: center; color: #a0aec0; margin-bottom: 40px;">Eine Auswahl meiner Fotografie-Projekte: Konzerte, Events, Portraits und freie Arbeiten.</p>
             ${categoriesHTML}
         </div>
 
+        <!-- Lightbox Modal für die Großansicht auf derselben Seite -->
+        <div id="lightbox-modal" style="display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); justify-content: center; align-items: center; cursor: pointer;" onclick="closeLightbox()">
+            <span style="position: absolute; top: 20px; right: 30px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer;" onclick="closeLightbox()">&times;</span>
+            <img id="lightbox-img" src="" style="max-width: 90%; max-height: 90%; border-radius: 6px; box-shadow: 0 0 25px rgba(0,0,0,0.9); user-select: none; -webkit-user-drag: none;" onclick="event.stopPropagation()">
+        </div>
+
         <script>
-            // Verhindert das Herunterladen per Rechtsklick auf Bilder
+            function openLightbox(src) {
+                const modal = document.getElementById('lightbox-modal');
+                const img = document.getElementById('lightbox-img');
+                img.src = src;
+                modal.style.display = 'flex';
+            }
+
+            function closeLightbox() {
+                const modal = document.getElementById('lightbox-modal');
+                modal.style.display = 'none';
+            }
+
+            // Globaler Schutz gegen Rechtsklick
             document.addEventListener('contextmenu', function(e) {
-                if (e.target.tagName === 'IMG') {
+                if (e.target.tagName === 'IMG' || e.target.closest('.photo-card')) {
                     e.preventDefault();
                 }
             });
@@ -67,7 +86,7 @@ function generateGallery() {
     `;
 
     fs.writeFileSync('fotos.html', galleryHTML);
-    console.log('✅ Galerie erfolgreich aus echten Ordnern in fotos.html generiert!');
+    console.log('✅ Galerie erfolgreich mit Lightbox und Schutz in fotos.html generiert!');
 }
 
 generateGallery();
