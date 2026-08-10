@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fotogalerie | Ubländer Productions</title>
+    <style>
+        /* CSS STYLES */
+        :root {
+            --bg-color: #0d0e15;
+            --card-bg: #161824;
+            --text-color: #f0f0f0;
+            --accent-color: #ff4757;
+            --text-muted: #a0a0a0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* HEADER / NAVIGATION */
+        header {
+            background-color: rgba(13, 14, 21, 0.95);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #25283b;
+            backdrop-filter: blur(10px);
+        }
+
+        nav {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.2rem 2rem;
+            gap: 1.2rem;
+        }
+
+        .logo-container {
+            text-align: center;
+            perspective: 1000px;
+            padding: 5px 0;
+        }
+
+        .brand-eyecatcher {
+            display: inline-block;
+            font-size: 2.8rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-family: 'Montserrat', 'Arial Black', sans-serif;
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 40%, #00c6ff 60%, #0072ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0px 2px 0px #0056b3) 
+                    drop-shadow(0px 4px 0px #002b66) 
+                    drop-shadow(0px 6px 12px rgba(0, 242, 254, 0.5))
+                    drop-shadow(0px 10px 25px rgba(0, 114, 255, 0.4));
+            transform: rotateX(8deg) rotateY(-2deg);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .brand-eyecatcher:hover {
+            transform: rotateX(0deg) rotateY(0deg) scale(1.05);
+            background: linear-gradient(135deg, #00f2fe 0%, #00c6ff 50%, #e0c3fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0px 2px 0px #0088ff) 
+                    drop-shadow(0px 5px 0px #0044ab) 
+                    drop-shadow(0px 8px 18px rgba(0, 242, 254, 0.8))
+                    drop-shadow(0px 12px 30px rgba(0, 242, 254, 0.6));
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.8rem;
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            letter-spacing: 1px;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+
+        nav a:hover, nav a.active {
+            color: #00f2fe;
+            text-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
+        }
+
+        /* MAIN CONTENT */
+        section {
+            padding: 9rem 2rem 4rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid #00f2fe;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* GALLERIE GRID STYLES */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .gallery-item {
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #25283b;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            border-color: #00f2fe;
+            box-shadow: 0 8px 20px rgba(0, 242, 254, 0.2);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            display: block;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-item:hover img {
+            opacity: 0.9;
+        }
+
+        .caption {
+            padding: 1rem;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid #25283b;
+            color: var(--text-muted);
+            margin-top: 4rem;
+        }
+
+        footer a, footer a:visited {
+            color: #b3b3b3;
+            text-decoration: underline;
+        }
+
+        footer a:hover {
+            color: #00f2fe;
+        }
+
+        @media (min-width: 768px) {
+            nav {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .brand-eyecatcher {
+                font-size: 2.1rem;
+                letter-spacing: 2px;
+            }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER / NAVIGATION -->
+    <header>
+        <nav>
+            <div class="logo-container">
+                <a href="index.html" class="brand-eyecatcher">Ubländer Productions</a>
+            </div>
+            <ul>
+                <li><a href="index.html#about">Über mich</a></li>
+                <li><a href="fotos.html" class="active">Fotos</a></li>
+                <li><a href="index.html#videos">Videos</a></li>
+                <li><a href="index.html#kontakt">Kontakt</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- FOTOGALERIE BEREICH -->
+    <section>
+        <h1>Fotogalerie</h1>
+        <p class="subtitle">Eine Auswahl meiner Fotografie-Projekte: Konzerte, Events, Porträts und freie Arbeiten.</p>
+
+        <div class="gallery-grid">
+            <!-- Event / Stage -->
+            <div class="gallery-item">
+                <img src="images/events/event1.jpg" alt="Event Fotografie">
+                <div class="caption">Event & Stage</div>
+            </div>
+
+            <!-- Portrait / TFP -->
+            <div class="gallery-item">
+                <img src="images/portraits/portrait1.jpg" alt="Portrait Fotografie">
+                <div class="caption">Portrait / TFP</div>
+            </div>
+
+            <!-- Live-Konzert (z.B. live1.jpg oder konzert1.jpg) -->
+            <div class="gallery-item">
+                <img src="images/konzerte/live1.jpg" alt="Konzert Fotografie">
+                <div class="caption">Live-Konzert</div>
+            </div>
+
+            <!-- Kreativprojekt -->
+            <div class="gallery-item">
+                <img src="images/kreativ/kreativ1.jpg" alt="Kreative Fotografie">
+                <div class="caption">Kreativprojekt</div>
+            </div>
+
+            <!-- Festival -->
+            <div class="gallery-item">
+                <img src="images/events/festival1.jpg" alt="Festival Impressionen">
+                <div class="caption">Festival Stimmung</div>
+            </div>
+
+            <!-- Besondere Momente -->
+            <div class="gallery-item">
+                <img src="images/sonstiges/moment1.jpg" alt="Persönlicher Moment">
+                <div class="caption">Besondere Momente</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 Kevin Ubländer. Alle Rechte vorbehalten. Urheberrechtlich geschütztes Material.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">
+            <a href="impressum.html">Impressum</a> | 
+            <a href="datenschutz.html">Datenschutz</a> | 
+            <a href="rechtliche_grundlagen_fotorecht.html" target="_blank">Rechtliche Hinweise</a>
+        </p>
+    </footer>
+
+</body>
+</html>
