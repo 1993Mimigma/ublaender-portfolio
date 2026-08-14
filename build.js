@@ -4,24 +4,53 @@ const path = require('path');
 const fotosDir = path.join(__dirname, 'fotos');
 const outputFile = path.join(__dirname, 'fotos.html');
 
-function scanDirectory(dir) {
-    if (!fs.existsSync(dir)) return { folders: {}, images: [] };
+function scanDirectory(dir, relativePath = '') {
+    if (!fs.existsSync(dir)) return { folders: {}, images: [], thumb: '' };
     const entries = fs.readdirSync(dir, { withFileTypes: true });
-    let result = { folders: {}, images: [] };
+    let result = { folders: {}, images: [], thumb: '' };
+    let titelbildImg = '';
 
     entries.forEach(entry => {
         const fullPath = path.join(dir, entry.name);
+        const relSubPath = relativePath ? relativePath + '/' + entry.name : entry.name;
         if (entry.isDirectory()) {
-            result.folders[entry.name] = scanDirectory(fullPath);
+            if (entry.name.toLowerCase() === 'titelbild') {
+                const tFiles = fs.readdirSync(fullPath).filter(f => /\.(jpg|jpeg|png|webp|gif)$/i.test(f));
+                if (tFiles.length > 0) {
+                    titelbildImg = 'fotos/' + relSubPath + '/' + tFiles[0];
+                }
+            }
+            result.folders[entry.name] = scanDirectory(fullPath, relSubPath);
         } else if (entry.isFile() && /\.(jpg|jpeg|png|webp|gif)$/i.test(entry.name)) {
             result.images.push(entry.name);
         }
     });
+
+    // Priorität für das Vorschaubild: 
+    // 1. Expliziter "Titelbild"-Ordnerinhalt
+    // 2. Erstes Foto direkt im Ordner
+    // 3. Erstes Foto aus Unterordnern
+    if (titelbildImg) {
+        result.thumb = titelbildImg;
+    } else if (result.images.length > 0) {
+        result.thumb = 'fotos/' + (relativePath ? relativePath + '/' : '') + result.images[0];
+    } else {
+        for (let subName in result.folders) {
+            if (subName.toLowerCase() === 'titelbild') continue;
+            if (result.folders[subName].thumb) {
+                result.thumb = result.folders[subName].thumb;
+                break;
+            }
+        }
+    }
+
     return result;
 }
 
 function generateGallery() {
     const structure = scanDirectory(fotosDir);
+    const jsonString = JSON.stringify(structure);
+
     const htmlContent = `<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -36,13 +65,16 @@ function generateGallery() {
         .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
         
-        /* Protection Layer */
-        .photo-item { height: 200px; background-size: cover; background-position: center; border-radius: 8px; cursor: pointer; position: relative; }
+        .card { background-color: var(--card-bg); border-radius: 8px; overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: transform 0.2s, border-color 0.2s; }
+        .card:hover { transform: translateY(-3px); border-color: var(--accent); }
+        
+        .photo-item { height: 200px; background-size: cover; background-position: center; border-radius: 8px; cursor: pointer; position: relative; transition: transform 0.2s; }
+        .photo-item:hover { transform: scale(1.02); }
         .protect { position: absolute; top:0; left:0; width:100%; height:100%; z-index:10; }
         
         #lightbox { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 1000; }
         #lightbox img { max-width: 90vw; max-height: 80vh; }
-        .nav-btn { position: absolute; color: white; font-size: 3rem; cursor: pointer; padding: 20px; }
+        .nav-btn { position: absolute; color: white; font-size: 3rem; cursor: pointer; padding: 20px; user-select: none; }
         #prev { left: 10px; } #next { right: 10px; }
     </style>
 </head>
@@ -63,30 +95,68 @@ function generateGallery() {
     </div>
 
     <script>
-        const galleryData = ${JSON.stringify(structure)};
+        const galleryData = ${jsonString};
         let currentImages = [];
         let curIdx = 0;
+        let currentPath = [];
 
-        function render(data = galleryData, pathArr = []) {
-            const app = document.getElementById('app');
-            let html = '<div class="grid">';
-            
-            // Render Folders
-            for (let folder in data.folders) {
-                html += \`<div class="card" style="background:var(--card-bg); padding:20px; border-radius:8px; cursor:pointer;" onclick="render(galleryData.folders['\${folder}'], ['\${folder}'])">
-                            <h3>\${folder.toUpperCase()}</h3>
-                          </div>\`;
+        function navigateTo(folderName) {
+            currentPath.push(folderName);
+            renderCurrent();
+        }
+
+        function navigateBack() {
+            currentPath.pop();
+            renderCurrent();
+        }
+
+        function getDataAtCurrentPath() {
+            let current = galleryData;
+            for (let folder of currentPath) {
+                current = current.folders[folder];
             }
+            return current;
+        }
+
+        function renderCurrent() {
+            const data = getDataAtCurrentPath();
+            const app = document.getElementById('app');
+            let html = '';
+
+            if (currentPath.length > 0) {
+                html += '<button onclick="navigateBack()" style="padding:10px 20px; background:#00f2fe; color:#0d0e15; border:none; border-radius:5px; font-weight:bold; cursor:pointer; margin-bottom:20px;">← Zurück</button><br>';
+            }
+
+            html += '<div class="grid">';
+
+            // Render Folders (Titelbild-Ordner wird übersprungen)
+            for (let folder in data.folders) {
+                if (folder.toLowerCase() === 'titelbild') continue;
+                let subData = data.folders[folder];
+                let thumbStyle = subData.thumb ? 'background-image:url(\\'' + subData.thumb + '\\');' : 'background-color:var(--card-bg);';
+                
+                html += '<div class="card" onclick="navigateTo(\\'' + folder.replace(/'/g, "\\\\'") + '\\')">' +
+                            '<div style="height:180px; ' + thumbStyle + ' background-size:cover; background-position:center;"></div>' +
+                            '<div style="padding:15px; font-weight:bold; font-size:1.1rem;">' + folder.toUpperCase() + '</div>' +
+                          '</div>';
+            }
+
             // Render Images
+            currentImages = [];
             data.images.forEach((img, i) => {
-                const imgPath = 'fotos/' + pathArr.join('/') + '/' + img;
-                html += \`<div class="photo-item" style="background-image:url('\${imgPath}')" onclick="openLb('\${imgPath}', \${i})">
-                            <div class="protect"></div>
-                          </div>\`;
-                currentImages.push(imgPath);
+                let fullImgPath = 'fotos/';
+                if (currentPath.length > 0) {
+                    fullImgPath += currentPath.join('/') + '/';
+                }
+                fullImgPath += img;
+                currentImages.push(fullImgPath);
+
+                html += '<div class="photo-item" style="background-image:url(\\'' + fullImgPath + '\\')" onclick="openLb(\\'' + fullImgPath + '\\', ' + i + ')">' +
+                            '<div class="protect"></div>' +
+                          '</div>';
             });
+
             html += '</div>';
-            if (pathArr.length > 0) html = \`<button onclick="location.reload()">← Zurück</button><br><br>\` + html;
             app.innerHTML = html;
         }
 
@@ -94,11 +164,21 @@ function generateGallery() {
         function closeLb() { document.getElementById('lightbox').style.display = 'none'; }
         function prevImg() { curIdx = (curIdx - 1 + currentImages.length) % currentImages.length; document.getElementById('lightbox-img').src = currentImages[curIdx]; }
         function nextImg() { curIdx = (curIdx + 1) % currentImages.length; document.getElementById('lightbox-img').src = currentImages[curIdx]; }
+
+        document.addEventListener('keydown', (e) => {
+            if(document.getElementById('lightbox').style.display === 'flex') {
+                if(e.key === 'ArrowLeft') prevImg();
+                if(e.key === 'ArrowRight') nextImg();
+                if(e.key === 'Escape') closeLb();
+            }
+        });
         
-        render();
+        renderCurrent();
     </script>
 </body>
 </html>`;
     fs.writeFileSync(outputFile, htmlContent, 'utf8');
+    console.log("✅ Galerie erfolgreich mit Vorschaubildern generiert!");
 }
+
 generateGallery();
