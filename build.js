@@ -2,91 +2,103 @@ const fs = require('fs');
 const path = require('path');
 
 const fotosDir = path.join(__dirname, 'fotos');
+const outputFile = path.join(__dirname, 'fotos.html');
 
-function generateGallery() {
-    let categoriesHTML = '';
+function scanDirectory(dir) {
+    if (!fs.existsSync(dir)) return { folders: {}, images: [] };
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    let result = { folders: {}, images: [] };
 
-    if (fs.existsSync(fotosDir)) {
-        const categories = fs.readdirSync(fotosDir, { withFileTypes: true })
-            .filter(dirent => dirent.isDirectory());
-
-        categories.forEach(category => {
-            const categoryName = category.name;
-            const categoryDir = path.join(fotosDir, categoryName);
-            const images = fs.readdirSync(categoryDir)
-                .filter(file => /\.(jpg|jpeg|png|webp|avif)$/i.test(file));
-
-            categoriesHTML += `
-                <div class="category-section" style="margin-bottom: 50px;">
-                    <h2 style="color: #00f0ff; margin-bottom: 20px; border-bottom: 2px solid #00f0ff; padding-bottom: 5px; display: inline-block;">${categoryName}</h2>
-                    <div class="photo-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
-            `;
-
-            images.forEach(image => {
-                const imagePath = `fotos/${categoryName}/${image}`;
-                categoriesHTML += `
-                    <div class="photo-card" style="position: relative; border-radius: 8px; overflow: hidden; background: #111; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
-                        <img src="${imagePath}" alt="${image}" style="width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none; pointer-events: none;">
-                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;" onclick="openLightbox('${imagePath}')" title="In Großansicht öffnen"></div>
-                    </div>
-                `;
-            });
-
-            categoriesHTML += `
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    let galleryHTML = `
-    <!DOCTYPE html>
-    <html lang="de">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Ubländer Productions - Fotos</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body class="dark-theme" style="background-color: #0b0f19; color: #fff; font-family: sans-serif; padding: 20px; margin: 0;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-            <h1 style="text-align: center; margin-bottom: 10px;">Fotografie</h1>
-            <p style="text-align: center; color: #a0aec0; margin-bottom: 40px;">Eine Auswahl meiner Fotografie-Projekte: Konzerte, Events, Portraits und freie Arbeiten.</p>
-            ${categoriesHTML}
-        </div>
-
-        <!-- Lightbox Modal für die Großansicht auf derselben Seite -->
-        <div id="lightbox-modal" style="display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); justify-content: center; align-items: center; cursor: pointer;" onclick="closeLightbox()">
-            <span style="position: absolute; top: 20px; right: 30px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer;" onclick="closeLightbox()">&times;</span>
-            <img id="lightbox-img" src="" style="max-width: 90%; max-height: 90%; border-radius: 6px; box-shadow: 0 0 25px rgba(0,0,0,0.9); user-select: none; -webkit-user-drag: none;" onclick="event.stopPropagation()">
-        </div>
-
-        <script>
-            function openLightbox(src) {
-                const modal = document.getElementById('lightbox-modal');
-                const img = document.getElementById('lightbox-img');
-                img.src = src;
-                modal.style.display = 'flex';
-            }
-
-            function closeLightbox() {
-                const modal = document.getElementById('lightbox-modal');
-                modal.style.display = 'none';
-            }
-
-            // Globaler Schutz gegen Rechtsklick
-            document.addEventListener('contextmenu', function(e) {
-                if (e.target.tagName === 'IMG' || e.target.closest('.photo-card')) {
-                    e.preventDefault();
-                }
-            });
-        </script>
-    </body>
-    </html>
-    `;
-
-    fs.writeFileSync('fotos.html', galleryHTML);
-    console.log('✅ Galerie erfolgreich mit Lightbox und Schutz in fotos.html generiert!');
+    entries.forEach(entry => {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+            result.folders[entry.name] = scanDirectory(fullPath);
+        } else if (entry.isFile() && /\.(jpg|jpeg|png|webp|gif)$/i.test(entry.name)) {
+            result.images.push(entry.name);
+        }
+    });
+    return result;
 }
 
+function generateGallery() {
+    const structure = scanDirectory(fotosDir);
+    const htmlContent = `<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fotogalerie | Ubländer Productions</title>
+    <style>
+        :root { --bg-color: #0d0e15; --accent: #00f2fe; --card-bg: #161824; }
+        body { background-color: var(--bg-color); color: white; font-family: sans-serif; margin: 0; }
+        header { text-align: center; padding: 20px; }
+        nav a { color: var(--accent); margin: 0 15px; text-decoration: none; font-weight: bold; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        
+        /* Protection Layer */
+        .photo-item { height: 200px; background-size: cover; background-position: center; border-radius: 8px; cursor: pointer; position: relative; }
+        .protect { position: absolute; top:0; left:0; width:100%; height:100%; z-index:10; }
+        
+        #lightbox { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        #lightbox img { max-width: 90vw; max-height: 80vh; }
+        .nav-btn { position: absolute; color: white; font-size: 3rem; cursor: pointer; padding: 20px; }
+        #prev { left: 10px; } #next { right: 10px; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <header>
+        <h1>Fotogalerie</h1>
+        <nav><a href="index.html">← Zurück zur Startseite</a></nav>
+    </header>
+
+    <div class="container" id="app"></div>
+
+    <div id="lightbox">
+        <div class="nav-btn" id="prev" onclick="prevImg()">&#10094;</div>
+        <img id="lightbox-img" src="">
+        <div class="nav-btn" id="next" onclick="nextImg()">&#10095;</div>
+        <div style="position:absolute; top:20px; right:20px; cursor:pointer; font-size:2rem;" onclick="closeLb()">×</div>
+    </div>
+
+    <script>
+        const galleryData = ${JSON.stringify(structure)};
+        let currentImages = [];
+        let curIdx = 0;
+
+        function render(data = galleryData, pathArr = []) {
+            const app = document.getElementById('app');
+            let html = '<div class="grid">';
+            
+            // Render Folders
+            for (let folder in data.folders) {
+                html += \`<div class="card" style="background:var(--card-bg); padding:20px; border-radius:8px; cursor:pointer;" onclick="render(galleryData.folders['\${folder}'], ['\${folder}'])">
+                            <h3>\${folder.toUpperCase()}</h3>
+                          </div>\`;
+            }
+            // Render Images
+            data.images.forEach((img, i) => {
+                const imgPath = 'fotos/' + pathArr.join('/') + '/' + img;
+                html += \`<div class="photo-item" style="background-image:url('\${imgPath}')" onclick="openLb('\${imgPath}', \${i})">
+                            <div class="protect"></div>
+                          </div>\`;
+                currentImages.push(imgPath);
+            });
+            html += '</div>';
+            if (pathArr.length > 0) html = \`<button onclick="location.reload()">← Zurück</button><br><br>\` + html;
+            app.innerHTML = html;
+        }
+
+        function openLb(src, i) { curIdx = i; document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').style.display = 'flex'; }
+        function closeLb() { document.getElementById('lightbox').style.display = 'none'; }
+        function prevImg() { curIdx = (curIdx - 1 + currentImages.length) % currentImages.length; document.getElementById('lightbox-img').src = currentImages[curIdx]; }
+        function nextImg() { curIdx = (curIdx + 1) % currentImages.length; document.getElementById('lightbox-img').src = currentImages[curIdx]; }
+        
+        render();
+    </script>
+</body>
+</html>`;
+    fs.writeFileSync(outputFile, htmlContent, 'utf8');
+}
 generateGallery();
