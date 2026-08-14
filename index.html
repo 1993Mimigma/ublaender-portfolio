@@ -3,356 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mein Portfolio | Fotografie & Videografie</title>
+    <title>Ubländer Productions - Über mich</title>
     <style>
-        /* CSS STYLES */
         :root {
-            --bg-color: #0d0e15;
-            --card-bg: #161824;
-            --text-color: #f0f0f0;
-            --accent-color: #ff4757;
-            --text-muted: #a0a0a0;
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --accent: #38bdf8;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
         }
-
-        * {
-            box-sizing: border-box;
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             margin: 0;
             padding: 0;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+        header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            background: linear-gradient(to bottom, #000000, var(--bg-color));
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            letter-spacing: 2px;
+            color: var(--text-main);
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+        nav {
+            margin-top: 20px;
+        }
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        nav a:hover, nav a.active {
+            color: var(--accent);
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
             line-height: 1.6;
         }
-
-        header {
-            background-color: rgba(13, 14, 21, 0.95);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid #25283b;
-            backdrop-filter: blur(10px);
+        .bio-box {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
-
-        nav {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 1.2rem 2rem;
-            gap: 1.2rem;
-        }
-
-        /* FUTURISTISCHER 3D LOGO-EYECATCHER */
-        .logo-container {
-            text-align: center;
-            perspective: 1000px;
-            padding: 5px 0;
-        }
-
-        .brand-eyecatcher {
-            display: inline-block;
-            font-size: 2.8rem;
-            font-weight: 900;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            text-decoration: none;
-            font-family: 'Montserrat', 'Arial Black', sans-serif;
-            
-            /* ZWEIFARBIGER FUTURISTISCHER GRADIENT (Cyan-Blau zu Neon-Magenta) */
-            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 40%, #00c6ff 60%, #0072ff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            
-            /* DYNAMISCHER MULTI-LAYER 3D-SCHATTEN & TIEFE */
-            text-shadow: none;
-            filter: drop-shadow(0px 2px 0px #0056b3) 
-                    drop-shadow(0px 4px 0px #002b66) 
-                    drop-shadow(0px 6px 12px rgba(0, 242, 254, 0.5))
-                    drop-shadow(0px 10px 25px rgba(0, 114, 255, 0.4));
-            
-            transform: rotateX(8deg) rotateY(-2deg);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .brand-eyecatcher:hover {
-            transform: rotateX(0deg) rotateY(0deg) scale(1.05);
-            background: linear-gradient(135deg, #00f2fe 0%, #00c6ff 50%, #e0c3fc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0px 2px 0px #0088ff) 
-                    drop-shadow(0px 5px 0px #0044ab) 
-                    drop-shadow(0px 8px 18px rgba(0, 242, 254, 0.8))
-                    drop-shadow(0px 12px 30px rgba(0, 242, 254, 0.6));
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 1.8rem;
-        }
-
-        nav a {
-            color: var(--text-color);
-            text-decoration: none;
-            font-weight: 500;
-            letter-spacing: 1px;
-            transition: color 0.3s, text-shadow 0.3s;
-        }
-
-        nav a:hover {
-            color: #00f2fe;
-            text-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
-        }
-
-        section {
-            padding: 9rem 2rem 4rem;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .hero {
-            height: 70vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            border-bottom: 1px solid #25283b;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(90deg, #ffffff, #a0a0a0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            max-width: 600px;
-        }
-
         h2 {
-            font-size: 2rem;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #00f2fe;
-            display: inline-block;
-            padding-bottom: 0.5rem;
-            text-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
-        }
-
-        /* GALLERIE STYLES */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .gallery-item {
-            background: var(--card-bg);
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #25283b;
-        }
-
-        .gallery-item img, 
-        .gallery-item video {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            display: block;
-        }
-
-        /* KONTAKTFORMULAR STYLES */
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-            max-width: 600px;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 0.8rem;
-            background: var(--card-bg);
-            border: 1px solid #25283b;
-            border-radius: 6px;
-            color: var(--text-color);
-            font-size: 1rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #00f2fe;
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
-        }
-
-        button {
-            padding: 0.8rem 1.5rem;
-            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.3s;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
-        }
-
-        footer {
-            text-align: center;
-            padding: 2rem;
-            border-top: 1px solid #25283b;
-            color: var(--text-muted);
-            margin-top: 4rem;
-        }
-
-        footer a, 
-        footer a:visited {
-            color: #b3b3b3;
-            text-decoration: underline;
-        }
-
-        footer a:hover {
-            color: #00f2fe;
-        }
-
-        @media (min-width: 768px) {
-            nav {
-                flex-direction: row;
-                justify-content: space-between;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .brand-eyecatcher {
-                font-size: 2.1rem;
-                letter-spacing: 2px;
-            }
-            .hero h1 { font-size: 2.2rem; }
+            color: var(--accent);
+            margin-top: 0;
         }
     </style>
 </head>
 <body>
 
-    <!-- HEADER / NAVIGATION -->
     <header>
+        <h1>UBLÄNDER PRODUCTIONS</h1>
         <nav>
-            <div class="logo-container">
-                <a href="index.html" class="brand-eyecatcher">Ubländer Productions</a>
-            </div>
-            <ul>
-                <li><a href="#about">Über mich</a></li>
-                <li><a href="fotos.html">Fotos</a></li>
-                <li><a href="#videos">Videos</a></li>
-                <li><a href="#kontakt">Kontakt</a></li>
-            </ul>
+            <a href="index.html" class="active">Über mich</a>
+            <a href="fotos.html">Fotos</a>
+            <a href="videos.html">Videos</a>
+            <a href="kontakt.html">Kontakt</a>
         </nav>
     </header>
 
-    <!-- HERO BEREICH -->
-    <section class="hero">
-        <h1>Fotografie & Videografie</h1>
-        <p>Willkommen in meiner visuellen Welt. Hier halte ich besondere Momente und Geschichten aus Leidenschaft in Bildern und Videos fest.</p>
-    </section>
-
-    <!-- ÜBER MICH -->
-    <section id="about">
-        <h2>Über mich</h2>
-        
-        <p style="font-size: 1.15rem; margin-bottom: 1.5rem; color: #ffffff;">
-            <strong>Willkommen bei Ubländer Productions!</strong>
-        </p>
-
-        <p style="margin-bottom: 2rem;">
-            Seit nunmehr sechs Jahren schlägt mein Herz für die Fotografie und Videografie. Was als neugieriges Hobby begann, hat sich über die Jahre zu meiner großen Leidenschaft entwickelt, bei der ich hohe Ansprüche an Qualität, Stimmung und Ästhetik stelle. Mein Ziel: Besondere Augenblicke in authentischen Bildern und Videos als schöne Erinnerungen festzuhalten.
-        </p>
-
-        <h3 style="margin-bottom: 1rem; color: #00f2fe;">Was ich mache</h3>
-        <p style="margin-bottom: 1.5rem;">
-            Ob persönliche Momente im Leben oder energiegeladene Impressionen von Events – ich halte Stimmungen fest, wie sie wirklich sind: authentisch und lebendig.
-        </p>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-bottom: 2.5rem;">
-            <!-- FOTOGRAFIE BOX -->
-            <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid #25283b;">
-                <h4 style="font-size: 1.2rem; margin-bottom: 0.8rem; color: #fff; border-bottom: 1px solid #00f2fe; padding-bottom: 0.3rem;">Fotografie</h4>
-                <ul style="list-style-type: disc; padding-left: 1.2rem; color: var(--text-muted);">
-                    <li style="margin-bottom: 0.4rem;"><strong style="color: #fff;">Persönliche Momente:</strong> Impressionen von Feiern & Anlässen</li>
-                    <li style="margin-bottom: 0.4rem;"><strong style="color: #fff;">Events & Stage:</strong> Konzerte, Festivals, Partys & Stadtfeste</li>
-                    <li style="margin-bottom: 0.4rem;"><strong style="color: #fff;">Freie Shootings:</strong> Portraits & kreative Fotoprojekte (TFP)</li>
-                    <li><strong style="color: #fff;">Eigene Ideen:</strong> Kreative Konzepte aus Leidenschaft</li>
-                </ul>
-            </div>
-
-            <!-- VIDEOGRAFIE BOX -->
-            <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid #25283b;">
-                <h4 style="font-size: 1.2rem; margin-bottom: 0.8rem; color: #fff; border-bottom: 1px solid #00f2fe; padding-bottom: 0.3rem;">Videografie</h4>
-                <ul style="list-style-type: disc; padding-left: 1.2rem; color: var(--text-muted);">
-                    <li style="margin-bottom: 0.4rem;"><strong style="color: #fff;">Live-Performances:</strong> Dynamische Videomitschnitte von Bühnenauftritten</li>
-                    <li style="margin-bottom: 0.4rem;"><strong style="color: #fff;">Musik- & Freizeitvideos:</strong> Kreative und atmosphärische Bildsprache</li>
-                    <li style="margin-bottom: 0.4rem;"><strong style="color: #fff;">Dokumentationen:</strong> Authentische Videoreportagen mit Blick fürs Detail</li>
-                    <li><strong style="color: #fff;">Freizeitprojekte:</strong> Von der ersten Idee bis zum fertigen Schnitt</li>
-                </ul>
-            </div>
+    <div class="container">
+        <div class="bio-box">
+            <h2>Willkommen bei Ubländer Productions</h2>
+            <p>Hier entsteht deine professionelle Foto- und Videoplattform. Entdecke Konzerte, Events, Porträts und freie Arbeiten, übersichtlich sortiert in Alben und dynamischen Unterordnern.</p>
+            <p>Füge einfach neue Ordner und Bilder auf deinem PC hinzu – der Watcher aktualisiert alles im Handumdrehen völlig automatisch!</p>
         </div>
-
-        <h3 style="margin-bottom: 0.8rem; color: #00f2fe;">Equipment & Technik</h3>
-        <p style="margin-bottom: 2rem;">
-            Für meine Hobby-Projekte verlasse ich mich auf ein aufeinander abgestimmtes Setup. Mit der <strong>Sony Alpha 7III</strong> fange ich knackscharfe, stimmungsvolle Bilder und Videos ein. Der <strong>DJI RS3 Gimbal</strong> in Kombination mit dem <strong>Tilta Magic Ring</strong> sorgt bei Kamerafahrten für weiche Bewegungen. Für den passenden Ton erstelle ich Audioaufnahmen mit einem <strong>Field Sound Recorder und externem Mikrofon</strong>.
-        </p>
-
-        <div style="background: rgba(0, 242, 254, 0.05); padding: 1.5rem; border-left: 4px solid #00f2fe; border-radius: 4px; margin-top: 2rem;">
-            <h4 style="margin-bottom: 0.5rem; color: #fff;">Lust auf ein gemeinsames Foto- oder Videoprojekt?</h4>
-            <p style="margin: 0; color: var(--text-muted);">
-                Du hast eine spannende Idee, möchtest dich austauschen oder hast Interesse an einem freien TFP-Shooting? Schreib mir einfach über das <a href="#kontakt" style="color: #00f2fe; text-decoration: underline;">Kontaktformular</a> – ich freue mich auf den Austausch!
-            </p>
-        </div>
-    </section>
-
-    <!-- KONTAKTFORMULAR -->
-    <section id="kontakt">
-        <h2>Kontakt</h2>
-
-        <form action="https://formspree.io/f/maewepab" method="POST">
-            <label for="name">Dein Name:</label><br>
-            <input type="text" id="name" name="name" placeholder="Max Mustermann" required><br><br>
-
-            <label for="email">Deine E-Mail-Adresse:</label><br>
-            <input type="email" id="email" name="email" placeholder="name@beispiel.de" required><br><br>
-
-            <label for="message">Deine Nachricht:</label><br>
-            <textarea id="message" name="message" rows="5" placeholder="Hallo Kevin, ..." required></textarea><br><br>
-
-            <button type="submit">Nachricht senden</button>
-        </form>
-
-        <!-- Dezenter Hinweis direkt unter dem Formular per iframe -->
-        <iframe src="hinweis_kontakt.html" style="width:100%; border:none; height:50px; overflow:hidden;" scrolling="no"></iframe>
-    </section>
-
-    <!-- FOOTER -->
-    <footer>
-        <p>&copy; 2026 Kevin Ubländer. Alle Rechte vorbehalten. Urheberrechtlich geschütztes Material.</p>
-        <p style="margin-top: 0.5rem; font-size: 0.9rem;">
-            <a href="impressum.html">Impressum</a> | 
-            <a href="datenschutz.html">Datenschutz</a> | 
-            <a href="rechtliche_grundlagen_fotorecht.html" target="_blank">Rechtliche Hinweise</a>
-        </p>
-    </footer>
+    </div>
 
 </body>
 </html>
