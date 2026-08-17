@@ -384,15 +384,13 @@
         </p>
     </footer>
 
-    <!-- AUTOMATISCHES GLOBALES WASSERZEICHEN-SKRIPT -->
+    <!-- AUTOMATISCHES WASSERZEICHEN-SKRIPT FÜR BILDER AUF DIESER SEITE -->
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-            const allImages = document.querySelectorAll('img');
+            const images = document.querySelectorAll('.watermarked-img-container img');
 
-            allImages.forEach(img => {
-                const applyWatermark = () => {
-                    if (img.dataset.watermarked) return;
-
+            images.forEach(img => {
+                const processImage = () => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
 
@@ -405,27 +403,25 @@
 
                     const fontSize = Math.max(16, Math.floor(canvas.width * 0.035));
                     ctx.font = `600 ${fontSize}px 'Montserrat', 'Segoe UI', sans-serif`;
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                    ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
                     ctx.shadowBlur = 6;
                     ctx.shadowOffsetX = 2;
                     ctx.shadowOffsetY = 2;
 
                     const text = "Ubländer Productions";
-                    const padding = fontSize * 1.5;
+                    const padding = fontSize * 1.2;
                     const x = canvas.width - ctx.measureText(text).width - padding;
                     const y = canvas.height - padding;
 
                     ctx.fillText(text, x, y);
-
                     img.src = canvas.toDataURL('image/jpeg', 0.92);
-                    img.dataset.watermarked = "true";
                 };
 
                 if (img.complete) {
-                    applyWatermark();
+                    processImage();
                 } else {
-                    img.onload = applyWatermark;
+                    img.onload = processImage;
                 }
             });
         });
