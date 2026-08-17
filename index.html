@@ -172,25 +172,6 @@
             display: block;
         }
 
-        /* Container für automatisches Wasserzeichen */
-        .watermarked-img-container {
-            width: 100%;
-            height: 250px;
-            position: relative;
-            background: #000;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .watermarked-img-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
         /* KONTAKTFORMULAR STYLES */
         form {
             display: flex;
@@ -287,7 +268,7 @@
             </div>
             <ul>
                 <li><a href="#about">Über mich</a></li>
-                <li><a href="Wasserzeichen_Copyright Claim.html">Fotos</a></li>
+                <li><a href="fotos.html">Fotos</a></li>
                 <li><a href="#videos">Videos</a></li>
                 <li><a href="#kontakt">Kontakt</a></li>
             </ul>
@@ -383,49 +364,6 @@
             <a href="rechtliche_grundlagen_fotorecht.html" target="_blank">Rechtliche Hinweise</a>
         </p>
     </footer>
-
-    <!-- AUTOMATISCHES WASSERZEICHEN-SKRIPT FÜR BILDER AUF DIESER SEITE -->
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            const images = document.querySelectorAll('.watermarked-img-container img');
-
-            images.forEach(img => {
-                const processImage = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-
-                    canvas.width = img.naturalWidth || img.width;
-                    canvas.height = img.naturalHeight || img.height;
-
-                    if (canvas.width === 0 || canvas.height === 0) return;
-
-                    ctx.drawImage(img, 0, 0);
-
-                    const fontSize = Math.max(16, Math.floor(canvas.width * 0.035));
-                    ctx.font = `600 ${fontSize}px 'Montserrat', 'Segoe UI', sans-serif`;
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
-                    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-                    ctx.shadowBlur = 6;
-                    ctx.shadowOffsetX = 2;
-                    ctx.shadowOffsetY = 2;
-
-                    const text = "Ubländer Productions";
-                    const padding = fontSize * 1.2;
-                    const x = canvas.width - ctx.measureText(text).width - padding;
-                    const y = canvas.height - padding;
-
-                    ctx.fillText(text, x, y);
-                    img.src = canvas.toDataURL('image/jpeg', 0.92);
-                };
-
-                if (img.complete) {
-                    processImage();
-                } else {
-                    img.onload = processImage;
-                }
-            });
-        });
-    </script>
 
 </body>
 </html>
