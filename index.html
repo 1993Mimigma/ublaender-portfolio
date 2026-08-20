@@ -63,7 +63,7 @@
             text-decoration: none;
             font-family: 'Montserrat', 'Arial Black', sans-serif;
             
-            /* ZWEIFARBIGER FUTURISTISCHER GRADIENT (Cyan-Blau zu Neon-Magenta) */
+            /* ZWEIFARBIGER FUTURISTISCHER GRADIENT */
             background: linear-gradient(135deg, #00f2fe 0%, #4facfe 40%, #00c6ff 60%, #0072ff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -148,26 +148,26 @@
             text-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
         }
 
-        /* GALLERIE STYLES */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .gallery-item {
-            background: var(--card-bg);
+        /* RESPONSIVE VIDEO PLAYER CONTAINER */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background-color: #000;
             border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
             border: 1px solid #25283b;
+            margin-top: 1.5rem;
         }
 
-        .gallery-item img, 
-        .gallery-item video {
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 250px;
-            object-fit: cover;
-            display: block;
+            height: 100%;
+            border: 0;
         }
 
         /* KONTAKTFORMULAR STYLES */
@@ -195,7 +195,8 @@
             box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
         }
 
-        button {
+        button, .btn-link {
+            display: inline-block;
             padding: 0.8rem 1.5rem;
             background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
             color: white;
@@ -204,10 +205,11 @@
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
+            text-decoration: none;
             transition: transform 0.2s, box-shadow 0.3s;
         }
 
-        button:hover {
+        button:hover, .btn-link:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
         }
@@ -257,7 +259,7 @@
             <ul>
                 <li><a href="#about">Über mich</a></li>
                 <li><a href="fotos.html">Fotos</a></li>
-                <li><a href="#videos">Videos</a></li>
+                <li><a href="videos.html">Videos</a></li>
                 <li><a href="#kontakt">Kontakt</a></li>
             </ul>
         </nav>
@@ -320,6 +322,28 @@
             <p style="margin: 0; color: var(--text-muted);">
                 Du hast eine spannende Idee, möchtest dich austauschen oder hast Interesse an einem freien TFP-Shooting? Schreib mir einfach über das <a href="#kontakt" style="color: #00f2fe; text-decoration: underline;">Kontaktformular</a> – ich freue mich auf den Austausch!
             </p>
+        </div>
+    </section>
+
+    <!-- VIDEOS ABSCHNITT (NEU) -->
+    <section id="videos">
+        <h2>Featured Video</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+            Hier ist eine Vorschau meiner aktuellen Videoprojekte.
+        </p>
+
+        <!-- EINGEBETTETES UNGELISTETES YOUTUBE VIDEO -->
+        <div class="video-wrapper">
+            <iframe 
+                src="https://www.youtube-nocookie.com/embed/Psh_S0id81A?rel=0" 
+                title="Ubländer Productions Video" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="videos.html" class="btn-link">Zur gesamten Videogalerie</a>
         </div>
     </section>
 
