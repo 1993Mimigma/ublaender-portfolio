@@ -37,39 +37,37 @@
             backdrop-filter: blur(10px);
         }
 
+        /* HEADER GRID FUER ZENTRIERTES LOGO & RECHTES MENUE */
         nav {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
             align-items: center;
             max-width: 1100px;
             margin: 0 auto;
-            padding: 1.2rem 2rem;
-            gap: 1.2rem;
+            padding: 1rem 2rem;
+            position: relative;
         }
 
-        /* FUTURISTISCHER 3D LOGO-EYECATCHER */
+        /* FUTURISTISCHER 3D LOGO-EYECATCHER (EXAKT ZENTRIERT) */
         .logo-container {
+            grid-column: 2;
             text-align: center;
             perspective: 1000px;
-            padding: 5px 0;
         }
 
         .brand-eyecatcher {
             display: inline-block;
-            font-size: 2.8rem;
+            font-size: 2.2rem;
             font-weight: 900;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
             text-transform: uppercase;
             text-decoration: none;
             font-family: 'Montserrat', 'Arial Black', sans-serif;
             
-            /* ZWEIFARBIGER FUTURISTISCHER GRADIENT */
             background: linear-gradient(135deg, #00f2fe 0%, #4facfe 40%, #00c6ff 60%, #0072ff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             
-            /* DYNAMISCHER MULTI-LAYER 3D-SCHATTEN & TIEFE */
-            text-shadow: none;
             filter: drop-shadow(0px 2px 0px #0056b3) 
                     drop-shadow(0px 4px 0px #002b66) 
                     drop-shadow(0px 6px 12px rgba(0, 242, 254, 0.5))
@@ -84,29 +82,60 @@
             background: linear-gradient(135deg, #00f2fe 0%, #00c6ff 50%, #e0c3fc 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0px 2px 0px #0088ff) 
-                    drop-shadow(0px 5px 0px #0044ab) 
-                    drop-shadow(0px 8px 18px rgba(0, 242, 254, 0.8))
-                    drop-shadow(0px 12px 30px rgba(0, 242, 254, 0.6));
         }
 
+        /* BURGER-BUTTON DYNAMISCH GANZ RECHTS */
+        .menu-toggle {
+            grid-column: 3;
+            justify-self: end;
+            background: none;
+            border: none;
+            color: #00f2fe;
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .menu-toggle:hover {
+            background: rgba(0, 242, 254, 0.1);
+        }
+
+        /* AUFKLAPPBARES MENUE (UNTEREINANDER GANZ RECHTS) */
         nav ul {
-            display: flex;
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 2rem;
+            background-color: var(--card-bg);
+            border: 1px solid #25283b;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
             list-style: none;
-            gap: 1.8rem;
+            flex-direction: column;
+            padding: 1rem 0;
+            width: 180px;
+            text-align: left;
         }
 
-        nav a {
+        nav ul.active {
+            display: flex;
+        }
+
+        nav ul li a {
+            display: block;
+            padding: 0.7rem 1.5rem;
             color: var(--text-color);
             text-decoration: none;
             font-weight: 500;
             letter-spacing: 1px;
-            transition: color 0.3s, text-shadow 0.3s;
+            transition: background 0.3s, color 0.3s;
         }
 
-        nav a:hover {
+        nav ul li a:hover {
+            background: rgba(0, 242, 254, 0.1);
             color: #00f2fe;
-            text-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
         }
 
         section {
@@ -173,7 +202,7 @@
             box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
         }
 
-        button, .btn-link {
+        button {
             display: inline-block;
             padding: 0.8rem 1.5rem;
             background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
@@ -183,11 +212,10 @@
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            text-decoration: none;
             transition: transform 0.2s, box-shadow 0.3s;
         }
 
-        button:hover, .btn-link:hover {
+        button:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
         }
@@ -210,17 +238,10 @@
             color: #00f2fe;
         }
 
-        @media (min-width: 768px) {
-            nav {
-                flex-direction: row;
-                justify-content: space-between;
-            }
-        }
-
         @media (max-width: 768px) {
             .brand-eyecatcher {
-                font-size: 2.1rem;
-                letter-spacing: 2px;
+                font-size: 1.6rem;
+                letter-spacing: 1px;
             }
             .hero h1 { font-size: 2.2rem; }
         }
@@ -231,14 +252,19 @@
     <!-- HEADER / NAVIGATION -->
     <header>
         <nav>
+            <div style="grid-column: 1;"></div> <!-- Platzhalter links für perfekte Zentrierung -->
+            
             <div class="logo-container">
                 <a href="index.html" class="brand-eyecatcher">Ubländer Productions</a>
             </div>
-            <ul>
-                <li><a href="#about">Über mich</a></li>
+
+            <button class="menu-toggle" id="menu-btn" aria-label="Menü öffnen">☰</button>
+
+            <ul id="nav-list">
+                <li><a href="#about" onclick="toggleMenu()">Über mich</a></li>
                 <li><a href="fotos.html">Fotos</a></li>
                 <li><a href="videos.html">Videos</a></li>
-                <li><a href="#kontakt">Kontakt</a></li>
+                <li><a href="#kontakt" onclick="toggleMenu()">Kontakt</a></li>
             </ul>
         </nav>
     </header>
@@ -333,6 +359,18 @@
             <a href="rechtliche_grundlagen_fotorecht.html" target="_blank">Rechtliche Hinweise</a>
         </p>
     </footer>
+
+    <!-- JAVASCRIPT FUER DAS MENUE -->
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const navList = document.getElementById('nav-list');
+
+        function toggleMenu() {
+            navList.classList.toggle('active');
+        }
+
+        menuBtn.addEventListener('click', toggleMenu);
+    </script>
 
 </body>
 </html>
