@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Videogalerie (Clean & Werbefrei)</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 2rem 1rem;
+            line-height: 1.5;
+        }
+
+        header {
+            max-width: 1200px;
+            margin: 0 auto 3rem auto;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.25rem;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .gallery-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .video-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 
+         * CSS-CROP-RAHMEN (VERSTECKT YOUTUBE-TITEL & BRANDING):
+         * Der Container schneidet durch overflow:hidden den oberen Titel 
+         * und untere Kontrollleisten-Branding-Elemente exakt ab.
+         */
+        .clean-video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Seitenverhältnis */
+            height: 0;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        .clean-video-wrapper iframe {
+            position: absolute;
+            /* Schiebt die obere YouTube-Titelleiste (-60px) nach oben aus dem sichtbaren Rahmen */
+            top: -60px;
+            left: 0;
+            width: 100%;
+            /* Vergrößert die Höhe, damit das Video trotz des Schiebens das Feld perfekt ausfüllt */
+            height: calc(100% + 120px);
+            border: 0;
+            pointer-events: auto;
+        }
+
+        .video-info {
+            padding: 1.25rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        .video-description {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        #loading {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 3rem;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        #error-message {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 2rem;
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            border-radius: 8px;
+            display: none;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Meine Videogalerie</h1>
+        <p>Werbefrei & Ohne YouTube-Branding eingebettet</p>
+    </header>
+
+    <main class="gallery-grid" id="video-gallery">
+        <div id="loading">Videos werden geladen...</div>
+        <div id="error-message"></div>
+    </main>
+
+    <script>
+        const VIDEOS_FILE_PATH = 'videos/videos.json';
+
+        async function fetchAndRenderVideos() {
+            const gallery = document.getElementById('video-gallery');
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('error-message');
+
+            try {
+                const response = await fetch(`${VIDEOS_FILE_PATH}?_=${new Date().getTime()}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Datei konnte nicht geladen werden (Status: ${response.status})`);
+                }
+
+                const videos = await response.json();
+
+                if (loading) loading.remove();
+
+                if (!Array.isArray(videos) || videos.length === 0) {
+                    gallery.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Aktuell sind keine Videos vorhanden.</p>';
+                    return;
+                }
+
+                videos.forEach(video => {
+                    const card = document.createElement('article');
+                    card.className = 'video-card';
+
+                    let videoId = extractYouTubeId(video.youtubeUrl || video.id);
+
+                    if (!videoId) return;
+
+                    // Parameter zur Maximierung des "Clean"-Looks:
+                    // modestbranding=1 (weniger YouTube-Logos)
+                    // rel=0 (keine fremden Videoempfehlungen am Ende)
+                    // controls=1 (Steuerung aktiv, aber Branding oben wird durch CSS abgeschnitten)
+                    const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?modestbranding=1&rel=0&controls=1&iv_load_policy=3`;
+
+                    card.innerHTML = `
+                        <div class="clean-video-wrapper">
+                            <iframe 
+                                src="${embedUrl}" 
+                                title="${escapeHtml(video.title || 'Video')}" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                        <div class="video-info">
+                            <h2 class="video-title">${escapeHtml(video.title || 'Unbenanntes Video')}</h2>
+                            ${video.description ? `<p class="video-description">${escapeHtml(video.description)}</p>` : ''}
+                        </div>
+                    `;
+
+                    gallery.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Fehler beim Laden der Videos:', error);
+                if (loading) loading.style.display = 'none';
+                errorMessage.style.display = 'block';
+                errorMessage.innerHTML = `
+                    <strong>Fehler beim Laden der Galerie:</strong><br>
+                    Stelle sicher, dass die Datei <code>videos/videos.json</code> existiert.<br>
+                    <small>Details: ${escapeHtml(error.message)}</small>
+                `;
+            }
+        }
+
+        function extractYouTubeId(urlOrId) {
+            if (!urlOrId) return null;
+            if (urlOrId.length === 11 && !urlOrId.includes('/')) return urlOrId;
+
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = urlOrId.match(regExp);
+
+            return (match && match[2].length === 11) ? match[2] : urlOrId;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.innerText = text;
+            return div.innerHTML;
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchAndRenderVideos);
+    </script>
+</body>
+</html>
